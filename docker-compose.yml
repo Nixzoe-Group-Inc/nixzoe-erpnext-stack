@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    image: frappe/erpnext:v15.0.0
+    container_name: nixzoe-erp-backend
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - MYSQL_ROOT_PASSWORD=nixzoe_secure_db_pass
+      - FRAPPE_SITE_NAME_HEADER=10.0.0.66
+    volumes:
+      - erp-site-data:/home/frappe/frappe-bench/sites
+    restart: always
+
+  frontend:
+    image: frappe/erpnext:v15.0.0
+    container_name: nixzoe-erp-frontend
+    command: nginx
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    restart: always
+
+  db:
+    image: mariadb:10.6
+    container_name: nixzoe-erp-db
+    environment:
+      - MYSQL_ROOT_PASSWORD=nixzoe_secure_db_pass
+    volumes:
+      - erp-db-data:/var/lib/mysql
+    restart: always
+
+  redis:
+    image: redis:7-alpine
+    container_name: nixzoe-erp-redis
+    restart: always
+
+volumes:
+  erp-site-data:
+  erp-db-data:
